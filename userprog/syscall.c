@@ -69,7 +69,9 @@ void check_valid_buffer(void* buffer, unsigned size, void* rsp, bool to_write) {
 
 void
 syscall_handler (struct intr_frame *f UNUSED) {
-
+#ifdef VM
+  thread_current()->rsp_stack = f->rsp;
+#endif
   int syscall_no = f->R.rax;
 
   uint64_t a1 = f->R.rdi;

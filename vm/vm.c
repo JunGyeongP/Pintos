@@ -91,7 +91,7 @@ spt_find_page (struct supplemental_page_table *spt UNUSED, void *va UNUSED) {
 	free(page);
 
 	return e != NULL ? hash_entry(e, struct page, hash_elem): NULL;
-	/* e와 같은 hash값을 가지는 VA를 가지는 원소를 e에 해당하는 bucket list에서 찾아 return*/
+	// e와 같은 hash값을 가지는 VA를 가지는 원소를 e에 해당하는 bucket list에서 찾아 return*/
 }
 
 bool insert_page(struct hash *pages, struct page *p){
@@ -187,6 +187,10 @@ vm_get_frame (void) {
 /* Growing the stack. */
 static void
 vm_stack_growth (void *addr UNUSED) {
+	if (vm_alloc_page(VM_ANON | VM_MARKER_0, addr, 1)){
+		vm_claim_page(addr);
+		thread_current()->stack_bottom -= PGSIZE;
+	}
 }
 
 /* Handle the fault on write_protected page */
@@ -203,6 +207,7 @@ vm_try_handle_fault (struct intr_frame *f UNUSED, void *addr UNUSED,
 
 	/* TODO: fault 여부 확인*/
 	if(is_kernel_vaddr(addr))  return false;
+
 	void *rsp_stack = is_kernel_vaddr(f->rsp) ? thread_current()->rsp_stack : f->rsp;
 
 	if(not_present){
