@@ -149,12 +149,13 @@ page_fault (struct intr_frame *f) {
     exit_handler (f->R.rdi);
   }
   /* Count page faults. */
+  exit_handler(-1);  // for project3 bad-ptr 
   page_fault_cnt++;
-
+ 
   /* If the fault is true fault, show info and exit. */
   printf ("Page fault at %p: %s error %s page in %s context.\n", fault_addr,
           not_present ? "not present" : "rights violation",
           write ? "writing" : "reading", user ? "user" : "kernel");
-   //   kill (f);
-   exit_handler(-1);  // 수정!
+   kill (f);
+   
 }
